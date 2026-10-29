@@ -10,10 +10,10 @@ It is not an LLM. You send a piece of text and a set of questions; it answers wi
 
 | Registry | Tags |
 |---|---|
-| `ghcr.io/uxiaohan/jevos-docker` | `<commit hash>` / `latest` |
-| `docker.io/uxiaohan/jevos` | `<commit hash>` / `latest` |
+| `ghcr.io/uxiaohan/jevos-docker` | `<short sha>` / `latest` |
+| `docker.io/uxiaohan/jevos` | `<short sha>` / `latest` |
 
-Both registries get the same build, pushed once — same image, two names. Pin the commit hash (or the digest) in production: `latest` moves on every rebuild.
+Both registries get the same build, pushed once — same image, two names. Pin the short commit hash (6 chars, e.g. `c7c497`) or the digest in production: `latest` moves on every rebuild.
 
 **linux/amd64 only.** Upstream ships an x86-64 Linux binary and nothing else. On Apple Silicon it runs under qemu emulation — it works, but roughly 10× slower.
 

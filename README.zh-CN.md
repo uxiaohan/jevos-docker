@@ -10,10 +10,10 @@
 
 | 仓库 | tag |
 |---|---|
-| `ghcr.io/uxiaohan/jevos-docker` | `<commit hash>` / `latest` |
-| `docker.io/uxiaohan/jevos` | `<commit hash>` / `latest` |
+| `ghcr.io/uxiaohan/jevos-docker` | `<短 sha>` / `latest` |
+| `docker.io/uxiaohan/jevos` | `<短 sha>` / `latest` |
 
-两个仓库是同一次构建推出来的，同一份镜像两个名字。生产环境请钉 commit hash 或 digest，`latest` 每次重新构建都会前移。
+两个仓库是同一次构建推出来的，同一份镜像两个名字。生产环境请钉短 commit hash（6 位，如 `c7c497`）或 digest，`latest` 每次重新构建都会前移。
 
 **仅支持 linux/amd64**：上游只发了 x86-64 的 Linux 二进制。Apple Silicon 上走 qemu 模拟，能跑，但慢一个数量级。
 
