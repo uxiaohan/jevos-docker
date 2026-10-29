@@ -19,19 +19,41 @@ Both registries get the same build, pushed once — same image, two names. Pin t
 
 ## Run
 
-```bash
-docker compose up -d
+### Docker Compose
+
+Save this as `compose.yaml` and run `docker compose up -d`:
+
+```yaml
+services:
+  jevos:
+    image: ghcr.io/uxiaohan/jevos-docker:latest   # or docker.io/uxiaohan/jevos:latest
+    container_name: jevos
+    restart: unless-stopped
+    ports:
+      - "8017:8017"
+    environment:
+      PORT: "8017"
+      JEV_API_KEY: "change-me"          # delete this line to disable auth
+    mem_limit: 2g
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
 ```
 
-Everything is in `compose.yaml`: image tag, port, thread count, API key. Edit and re-run `up -d`.
-
-Without compose:
+### docker run
 
 ```bash
 docker run -d --name jevos --restart unless-stopped \
-  -p 8017:8017 -e JEV_API_KEY=your-key \
-  ghcr.io/uxiaohan/jevos-docker:latest
+  -p 8017:8017 \
+  -e PORT=8017 \
+  -e JEV_API_KEY=your-key \
+  --memory=2g \
+  uxiaohan/jevos:latest
 ```
+
+Drop `-e JEV_API_KEY=...` to run without authentication. See [Configuration](#configuration) for the full variable list, and [Images](#images) for pinning a build.
 
 The log tells you where it listens and whether auth is on; `healthy` is printed once the model is loaded:
 

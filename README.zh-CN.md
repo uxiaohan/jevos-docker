@@ -19,19 +19,41 @@
 
 ## 运行
 
-```bash
-docker compose up -d
+### Docker Compose
+
+存成 `compose.yaml`，然后 `docker compose up -d`：
+
+```yaml
+services:
+  jevos:
+    image: ghcr.io/uxiaohan/jevos-docker:latest   # 或 docker.io/uxiaohan/jevos:latest
+    container_name: jevos
+    restart: unless-stopped
+    ports:
+      - "8017:8017"
+    environment:
+      PORT: "8017"
+      JEV_API_KEY: "change-me"          # 删掉这行即关闭鉴权
+    mem_limit: 2g
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
 ```
 
-镜像版本、端口、线程数、API key 全在 `compose.yaml` 里，改完重新 `up -d` 生效。
-
-不用 compose：
+### docker run
 
 ```bash
 docker run -d --name jevos --restart unless-stopped \
-  -p 8017:8017 -e JEV_API_KEY=your-key \
-  ghcr.io/uxiaohan/jevos-docker:latest
+  -p 8017:8017 \
+  -e PORT=8017 \
+  -e JEV_API_KEY=your-key \
+  --memory=2g \
+  uxiaohan/jevos:latest
 ```
+
+去掉 `-e JEV_API_KEY=...` 即无鉴权运行。完整变量见[配置](#配置)，钉版本见[镜像](#镜像)。
 
 启动日志告诉你监听地址和鉴权方式，模型加载完成后打印 `healthy`：
 
