@@ -1,0 +1,17 @@
+services:
+  jevos:
+    image: ghcr.io/uxiaohan/jevos-docker:latest
+    container_name: jevos
+    restart: unless-stopped
+    ports:
+      - "8017:8017"
+    environment:
+      PORT: "8017"
+      # 删掉这行即关闭鉴权
+      JEV_API_KEY: "change-me"
+    mem_limit: 2g
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
