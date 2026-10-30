@@ -34,7 +34,8 @@ services:
     environment:
       PORT: "8017"
       JEV_API_KEY: "change-me"          # 删掉这行即关闭鉴权
-    mem_limit: 2g
+      WARMUP: "0"
+    mem_limit: 4g
     logging:
       driver: json-file
       options:
@@ -49,7 +50,8 @@ docker run -d --name jevos --restart unless-stopped \
   -p 8017:8017 \
   -e PORT=8017 \
   -e JEV_API_KEY=your-key \
-  --memory=2g \
+  -e WARMUP=0 \
+  --memory=4g \
   uxiaohan/jevos:latest
 ```
 
@@ -103,6 +105,7 @@ curl http://127.0.0.1:8017/v1/systemone \
 |---|---|---|
 | `PORT` | `8017` | 监听端口 |
 | `THREADS` | 自动 | 推理线程数。默认按容器 CPU 限制推算（cgroup 配额，没有配额则看亲和性）——上游二进制自己只数宿主机核数，会把限核容器撑爆。只有要强制指定时才设 |
+| `WARMUP` | `0` | 空闲时预热到多长的 prompt。`0` 关闭：空载不占 CPU，加载完成后内存不再增长，代价是某个新长度的第一次请求多花几毫秒编译 kernel。想要收回这点延迟再设 64–384 |
 | `JEV_API_KEY` | 空 = 不鉴权 | 设置后所有请求需要 `Authorization: Bearer <key>`。`compose.yaml` 里默认 `change-me`，删掉该行即关闭鉴权 |
 
 ## 占用
@@ -113,7 +116,7 @@ curl http://127.0.0.1:8017/v1/systemone \
 
 **无状态**：模型烘在镜像里，其余全在内存，没有需要挂载的卷，`--read-only` 也能正常跑。
 
-`compose.yaml` 里的 `mem_limit: 2g` 是按原生 x86 定的。Apple Silicon 走 qemu 模拟内存约翻倍，要调到 3g 以上。
+`compose.yaml` 里的 `mem_limit: 4g`：加载完约 1.6GB，状态缓存塞满再多约 0.3GB，而且空闲时不归还内存，所以要留余量。Apple Silicon 走 qemu 模拟内存约翻四倍，要调到 8g 以上。
 
 ## 重新构建
 

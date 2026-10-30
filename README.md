@@ -34,7 +34,8 @@ services:
     environment:
       PORT: "8017"
       JEV_API_KEY: "change-me"          # delete this line to disable auth
-    mem_limit: 2g
+      WARMUP: "0"
+    mem_limit: 4g
     logging:
       driver: json-file
       options:
@@ -49,7 +50,8 @@ docker run -d --name jevos --restart unless-stopped \
   -p 8017:8017 \
   -e PORT=8017 \
   -e JEV_API_KEY=your-key \
-  --memory=2g \
+  -e WARMUP=0 \
+  --memory=4g \
   uxiaohan/jevos:latest
 ```
 
@@ -103,6 +105,7 @@ Several questions can be asked about the same text in one request; it is read on
 |---|---|---|
 | `PORT` | `8017` | Listen port |
 | `THREADS` | auto | Inference threads. Defaults to the container's CPU limit (cgroup quota, else the affinity mask) — the binary on its own counts host CPUs and oversubscribes a limited container. Set it only to force a value |
+| `WARMUP` | `0` | Prompt lengths `1..N` the server warms while idle, at the cost of idle CPU and memory. `0` disables it: nothing to warm, no growth after load, and the first request at a new token length pays a few ms building its kernels. Raise it (64–384) only if you want that latency back |
 | `JEV_API_KEY` | empty = no auth | When set, every request needs `Authorization: Bearer <key>`. `compose.yaml` ships `change-me`; delete the line to disable auth |
 
 ## Footprint
@@ -113,7 +116,7 @@ Several questions can be asked about the same text in one request; it is read on
 
 **No state.** The model is baked into the image and everything else lives in memory, so there are no volumes to mount — the container also runs fine with `--read-only`.
 
-`compose.yaml` sets `mem_limit: 2g` for native x86. Under Apple Silicon emulation memory roughly doubles — raise it to 3g+.
+`compose.yaml` sets `mem_limit: 4g`: budget roughly 1.6 GB after loading plus up to ~0.3 GB once the state cache fills, and the process does not hand memory back while idle — so leave headroom. Under Apple Silicon emulation memory roughly quadruples; give it 8g+.
 
 ## Rebuilding
 

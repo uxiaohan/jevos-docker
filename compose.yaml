@@ -9,7 +9,8 @@ services:
       PORT: "8017"
       # 删掉这行即关闭鉴权
       JEV_API_KEY: "change-me"
-    mem_limit: 2g
+      WARMUP: "0"
+    mem_limit: 4g
     logging:
       driver: json-file
       options:

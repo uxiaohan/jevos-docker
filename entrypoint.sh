@@ -3,6 +3,7 @@ set -eu
 
 PORT="${PORT:-8017}"
 THREADS="${THREADS:-}"
+WARMUP="${WARMUP:-0}"
 MODEL_DIR="/opt/jev/model"
 
 log() { printf '[jevos] %s\n' "$*" >&2; }
@@ -39,10 +40,14 @@ detect_threads() {
 
 [ -n "$THREADS" ] || THREADS=$(detect_threads)
 
+case "$WARMUP" in
+    ''|*[!0-9]*) log "WARMUP must be a prompt length, got '${WARMUP}'"; exit 2 ;;
+esac
+
 log "listening on http://0.0.0.0:${PORT}"
 log "auth: ${AUTH}"
 
-set -- --threads "$THREADS"
+set -- --threads "$THREADS" --warmup "$WARMUP"
 /opt/jev/jev serve --host 0.0.0.0 --port "$PORT" --model-dir "$MODEL_DIR" "$@" &
 pid=$!
 
